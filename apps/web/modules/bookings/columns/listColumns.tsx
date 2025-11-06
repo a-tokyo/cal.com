@@ -37,6 +37,7 @@ export function buildListDisplayColumns({
   return [
     columnHelper.display({
       id: "date",
+      size: 140,
       header: () => <span className="text-subtle text-sm font-medium">{t("date")}</span>,
       cell: (props) => {
         const row = props.row.original;
@@ -51,6 +52,7 @@ export function buildListDisplayColumns({
     }),
     columnHelper.display({
       id: "time",
+      size: 140,
       header: () => <span className="text-subtle text-sm font-medium">{t("time")}</span>,
       cell: (props) => {
         const row = props.row.original;
@@ -68,6 +70,7 @@ export function buildListDisplayColumns({
     }),
     columnHelper.display({
       id: "event",
+      minSize: 200,
       header: () => <span className="text-subtle text-sm font-medium">{t("event")}</span>,
       cell: (props) => {
         const row = props.row.original;
@@ -78,6 +81,7 @@ export function buildListDisplayColumns({
     }),
     columnHelper.display({
       id: "who",
+      size: 160,
       header: () => <span className="text-subtle text-sm font-medium">{t("who")}</span>,
       cell: (props) => {
         const row = props.row.original;
@@ -95,6 +99,7 @@ export function buildListDisplayColumns({
     }),
     columnHelper.display({
       id: "team",
+      size: 140,
       header: () => <span className="text-subtle text-sm font-medium">{t("team")}</span>,
       cell: (props) => {
         const row = props.row.original;
@@ -112,6 +117,8 @@ export function buildListDisplayColumns({
     }),
     columnHelper.display({
       id: "actions",
+      size: 280,
+      enableHiding: false,
       header: () => null,
       cell: (props) => {
         const row = props.row.original;

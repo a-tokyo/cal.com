@@ -118,6 +118,9 @@ export function BookingsListContainer({
     columns,
     initialState: {
       columnVisibility: getFilterColumnVisibility(),
+      columnPinning: {
+        right: ["actions"],
+      },
     },
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
