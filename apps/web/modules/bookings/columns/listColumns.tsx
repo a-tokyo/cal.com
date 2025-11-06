@@ -22,7 +22,7 @@ interface BuildListDisplayColumnsParams {
     timeFormat?: number | null;
   } | null;
   onOpenDetails: (bookingId: number) => void;
-  pendingActionHandlers?: PendingActionHandlers;
+  pendingActionHandlers: PendingActionHandlers;
 }
 
 export function buildListDisplayColumns({
@@ -138,7 +138,7 @@ export function buildListDisplayColumns({
 
         return (
           <div className="flex w-full items-center justify-end gap-2">
-            {shouldShowReject && pendingActionHandlers && (
+            {shouldShowReject && (
               <Button
                 color="minimal"
                 size="sm"
@@ -152,7 +152,7 @@ export function buildListDisplayColumns({
                 {showAllLabel ? t("reject_all") : t("reject")}
               </Button>
             )}
-            {shouldShowAccept && pendingActionHandlers && (
+            {shouldShowAccept && (
               <Button
                 color="secondary"
                 size="sm"
