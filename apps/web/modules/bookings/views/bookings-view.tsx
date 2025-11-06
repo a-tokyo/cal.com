@@ -287,10 +287,8 @@ function BookingsContent({ status, permissions }: BookingsProps) {
   const isPending = query.isPending;
   const totalRowCount = query.data?.totalCount;
 
-  const handleRowClick = (row: { original: RowData }) => {
-    if (row.original.type === "data") {
-      setSelectedBookingId(row.original.booking.id);
-    }
+  const handleOpenDetails = (bookingId: number) => {
+    setSelectedBookingId(bookingId);
   };
 
   return (
@@ -319,7 +317,7 @@ function BookingsContent({ status, permissions }: BookingsProps) {
                   data={finalData}
                   isPending={isPending}
                   totalRowCount={totalRowCount}
-                  onRowClick={handleRowClick}
+                  onOpenDetails={handleOpenDetails}
                 />
               ) : (
                 <BookingsCalendarContainer status={status} permissions={permissions} data={finalData} />

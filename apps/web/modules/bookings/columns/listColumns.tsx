@@ -5,6 +5,7 @@ import { isSeparatorRow } from "@calcom/features/data-table/lib/separator";
 import { getPlaceholderAvatar } from "@calcom/lib/defaultAvatarImage";
 import { AvatarGroup } from "@calcom/ui/components/avatar";
 import { Badge } from "@calcom/ui/components/badge";
+import { Button } from "@calcom/ui/components/button";
 
 import type { RowData } from "../types";
 
@@ -14,9 +15,10 @@ interface BuildListDisplayColumnsParams {
     timeZone?: string;
     timeFormat?: number | null;
   } | null;
+  onOpenDetails: (bookingId: number) => void;
 }
 
-export function buildListDisplayColumns({ t, user }: BuildListDisplayColumnsParams) {
+export function buildListDisplayColumns({ t, user, onOpenDetails }: BuildListDisplayColumnsParams) {
   const columnHelper = createColumnHelper<RowData>();
 
   return [
@@ -98,7 +100,24 @@ export function buildListDisplayColumns({ t, user }: BuildListDisplayColumnsPara
     columnHelper.display({
       id: "actions",
       header: () => null,
-      cell: () => null,
+      cell: (props) => {
+        const row = props.row.original;
+        if (isSeparatorRow(row)) return null;
+
+        return (
+          <div className="flex w-full justify-end">
+            <Button
+              variant="icon"
+              color="secondary"
+              StartIcon="ellipsis"
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenDetails?.(row.booking.id);
+              }}
+            />
+          </div>
+        );
+      },
     }),
   ];
 }

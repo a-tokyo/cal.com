@@ -1,6 +1,5 @@
 "use client";
 
-import type { Row } from "@tanstack/react-table";
 import { useReactTable, getCoreRowModel, getSortedRowModel } from "@tanstack/react-table";
 import { useMemo } from "react";
 
@@ -22,7 +21,7 @@ interface BookingsListContainerProps {
   data: RowData[];
   isPending: boolean;
   totalRowCount?: number;
-  onRowClick?: (row: Row<RowData>) => void;
+  onOpenDetails: (bookingId: number) => void;
 }
 
 export function BookingsListContainer({
@@ -31,16 +30,16 @@ export function BookingsListContainer({
   data,
   isPending,
   totalRowCount,
-  onRowClick,
+  onOpenDetails,
 }: BookingsListContainerProps) {
   const { t } = useLocale();
   const user = useMeQuery().data;
 
   const columns = useMemo(() => {
     const filterCols = buildFilterColumns({ t, permissions, status });
-    const listCols = buildListDisplayColumns({ t, user });
+    const listCols = buildListDisplayColumns({ t, user, onOpenDetails });
     return [...filterCols, ...listCols];
-  }, [t, permissions, status, user]);
+  }, [t, permissions, status, user, onOpenDetails]);
 
   const getFacetedUniqueValues = useFacetedUniqueValues();
 
@@ -61,7 +60,7 @@ export function BookingsListContainer({
       table={table}
       isPending={isPending}
       totalRowCount={totalRowCount}
-      onRowClick={onRowClick}
+      onOpenDetails={onOpenDetails}
     />
   );
 }
