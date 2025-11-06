@@ -17,9 +17,15 @@ interface BookingsCalendarContainerProps {
     canReadOthersBookings: boolean;
   };
   data: RowData[];
+  isPending?: boolean;
 }
 
-export function BookingsCalendarContainer({ status, permissions, data }: BookingsCalendarContainerProps) {
+export function BookingsCalendarContainer({
+  status,
+  permissions,
+  data,
+  isPending = false,
+}: BookingsCalendarContainerProps) {
   const { t } = useLocale();
 
   const columns = useMemo(() => {
@@ -39,5 +45,5 @@ export function BookingsCalendarContainer({ status, permissions, data }: Booking
     getFacetedUniqueValues,
   });
 
-  return <BookingsCalendar status={status} table={table} />;
+  return <BookingsCalendar status={status} table={table} isPending={isPending} />;
 }

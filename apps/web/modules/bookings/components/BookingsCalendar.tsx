@@ -19,6 +19,7 @@ import { BookingsCalendarView } from "./BookingsCalendarView";
 type BookingsCalendarViewProps = {
   status: BookingListingStatus;
   table: ReactTable<RowData>;
+  isPending?: boolean;
 };
 
 const COLUMN_IDS_TO_HIDE = ["dateRange"];
@@ -31,7 +32,7 @@ const weekStartParser = createParser({
   serialize: (value: dayjs.Dayjs) => value.format("YYYY-MM-DD"),
 });
 
-export function BookingsCalendar({ table }: BookingsCalendarViewProps) {
+export function BookingsCalendar({ table, isPending = false }: BookingsCalendarViewProps) {
   const { rows } = table.getRowModel();
   const { updateFilter } = useDataTable();
 
@@ -84,6 +85,7 @@ export function BookingsCalendar({ table }: BookingsCalendarViewProps) {
         bookings={bookings}
         currentWeekStart={currentWeekStart}
         onWeekStartChange={handleWeekStartChange}
+        isPending={isPending}
       />
     </>
   );

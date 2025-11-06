@@ -331,7 +331,12 @@ function BookingsContent({ status, permissions }: BookingsProps) {
                   onOpenDetails={handleOpenDetails}
                 />
               ) : (
-                <BookingsCalendarContainer status={status} permissions={permissions} data={finalData} />
+                <BookingsCalendarContainer
+                  status={status}
+                  permissions={permissions}
+                  data={finalData}
+                  isPending={isPending}
+                />
               )}
             </>
           )}
