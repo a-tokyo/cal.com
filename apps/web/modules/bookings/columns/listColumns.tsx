@@ -76,7 +76,11 @@ export function buildListDisplayColumns({
         const row = props.row.original;
         if (isSeparatorRow(row)) return null;
 
-        return <div className="text-emphasis flex-1 truncate text-sm font-medium">{row.booking.title}</div>;
+        return (
+          <div className="text-emphasis flex-1 truncate text-sm font-medium" data-testid="title">
+            {row.booking.title}
+          </div>
+        );
       },
     }),
     columnHelper.display({
@@ -157,6 +161,7 @@ export function buildListDisplayColumns({
                 size="sm"
                 StartIcon="ban"
                 disabled={pendingActionHandlers.isLoading}
+                data-testid="reject"
                 onClick={(e) => {
                   e.stopPropagation();
                   const recurringEventId = showAllLabel ? booking.recurringEventId : null;
@@ -171,6 +176,7 @@ export function buildListDisplayColumns({
                 size="sm"
                 StartIcon="check"
                 disabled={pendingActionHandlers.isLoading}
+                data-testid="confirm"
                 onClick={(e) => {
                   e.stopPropagation();
                   const recurringEventId = showAllLabel ? booking.recurringEventId : null;
@@ -192,6 +198,7 @@ export function buildListDisplayColumns({
               size="sm"
               color="secondary"
               StartIcon="ellipsis"
+              data-testid="booking-options"
               onClick={(e) => {
                 e.stopPropagation();
                 onOpenDetails?.(row.booking.id);

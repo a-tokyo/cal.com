@@ -52,6 +52,16 @@ export function BookingsList({
       table={table}
       testId={`${status}-bookings`}
       bodyTestId="bookings"
+      rowTestId={(row) => {
+        if (isSeparatorRow(row.original)) return undefined;
+        return "booking-item";
+      }}
+      rowDataAttributes={(row) => {
+        if (isSeparatorRow(row.original)) return undefined;
+        return {
+          "data-today": String(row.original.isToday),
+        };
+      }}
       isPending={isPending}
       totalRowCount={totalRowCount}
       variant="default"
