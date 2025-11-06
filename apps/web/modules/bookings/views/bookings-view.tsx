@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useSearchParams, usePathname } from "next/navigation";
-import { createParser, useQueryState } from "nuqs";
+import { useQueryState } from "nuqs";
 import { useMemo } from "react";
 
 import dayjs from "@calcom/dayjs";
@@ -26,6 +26,7 @@ import { HorizontalTabs } from "@calcom/ui/components/navigation";
 import { WipeMyCalActionButton } from "@calcom/web/components/apps/wipemycalother/wipeMyCalActionButton";
 
 import type { validStatuses } from "~/bookings/lib/validStatuses";
+import { viewParser } from "~/bookings/lib/viewParser";
 
 import { BookingDetailsSheet } from "../components/BookingDetailsSheet";
 import { useBookingCursor } from "../hooks/useBookingCursor";
@@ -35,7 +36,9 @@ const BookingsListContainer = dynamic(() =>
   import("../components/BookingsListContainer").then((mod) => ({ default: mod.BookingsListContainer }))
 );
 const BookingsCalendarContainer = dynamic(() =>
-  import("../components/BookingsCalendarContainer").then((mod) => ({ default: mod.BookingsCalendarContainer }))
+  import("../components/BookingsCalendarContainer").then((mod) => ({
+    default: mod.BookingsCalendarContainer,
+  }))
 );
 
 type BookingsProps = {
@@ -85,14 +88,6 @@ export default function Bookings(props: BookingsProps) {
     </DataTableProvider>
   );
 }
-
-const viewParser = createParser({
-  parse: (value: string) => {
-    if (value === "calendar") return "calendar";
-    return "list";
-  },
-  serialize: (value: "list" | "calendar") => value,
-});
 
 function BookingsContent({ status, permissions, isCalendarViewEnabled }: BookingsProps) {
   const [_view] = useQueryState("view", viewParser.withDefault("list"));
