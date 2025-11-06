@@ -9,6 +9,12 @@ import { Button } from "@calcom/ui/components/button";
 
 import type { RowData } from "../types";
 
+interface PendingActionHandlers {
+  onAccept: (bookingId: number, recurringEventId?: string | null) => void;
+  onReject: (bookingId: number, recurringEventId?: string | null) => void;
+  isLoading?: boolean;
+}
+
 interface BuildListDisplayColumnsParams {
   t: (key: string) => string;
   user?: {
@@ -16,9 +22,15 @@ interface BuildListDisplayColumnsParams {
     timeFormat?: number | null;
   } | null;
   onOpenDetails: (bookingId: number) => void;
+  pendingActionHandlers?: PendingActionHandlers;
 }
 
-export function buildListDisplayColumns({ t, user, onOpenDetails }: BuildListDisplayColumnsParams) {
+export function buildListDisplayColumns({
+  t,
+  user,
+  onOpenDetails,
+  pendingActionHandlers,
+}: BuildListDisplayColumnsParams) {
   const columnHelper = createColumnHelper<RowData>();
 
   return [
@@ -104,10 +116,59 @@ export function buildListDisplayColumns({ t, user, onOpenDetails }: BuildListDis
         const row = props.row.original;
         if (isSeparatorRow(row)) return null;
 
+        const booking = row.booking;
+        const isPending = booking.status === "PENDING";
+        const isUpcoming = new Date(booking.endTime) >= new Date();
+        const isCancelled = booking.status === "CANCELLED";
+
+        // Determine if we should show pending actions
+        const shouldShowPendingActions = isPending && isUpcoming && !isCancelled;
+
+        // Determine which buttons to show based on payment status
+        const hasPayment = booking.payment.length > 0;
+        const isPaid = booking.paid;
+        const shouldShowAccept = shouldShowPendingActions && (!hasPayment || isPaid);
+        const shouldShowReject = shouldShowPendingActions;
+
+        // Determine if this is a recurring booking for the label
+        const isRecurring = booking.recurringEventId !== null;
+        const isTabRecurring = row.type === "data" && row.recurringInfo !== undefined;
+        const isTabUnconfirmed = booking.status === "PENDING";
+        const showAllLabel = (isTabRecurring || isTabUnconfirmed) && isRecurring;
+
         return (
-          <div className="flex w-full justify-end">
+          <div className="flex w-full items-center justify-end gap-2">
+            {shouldShowReject && pendingActionHandlers && (
+              <Button
+                color="minimal"
+                size="sm"
+                StartIcon="ban"
+                disabled={pendingActionHandlers.isLoading}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const recurringEventId = showAllLabel ? booking.recurringEventId : null;
+                  pendingActionHandlers.onReject(booking.id, recurringEventId);
+                }}>
+                {showAllLabel ? t("reject_all") : t("reject")}
+              </Button>
+            )}
+            {shouldShowAccept && pendingActionHandlers && (
+              <Button
+                color="secondary"
+                size="sm"
+                StartIcon="check"
+                disabled={pendingActionHandlers.isLoading}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const recurringEventId = showAllLabel ? booking.recurringEventId : null;
+                  pendingActionHandlers.onAccept(booking.id, recurringEventId);
+                }}>
+                {showAllLabel ? t("confirm_all") : t("confirm")}
+              </Button>
+            )}
             <Button
               variant="icon"
+              size="sm"
               color="secondary"
               StartIcon="ellipsis"
               onClick={(e) => {
