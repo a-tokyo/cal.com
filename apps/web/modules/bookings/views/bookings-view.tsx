@@ -155,23 +155,29 @@ function BookingsContent({ status, permissions }: BookingsProps) {
   const queryLimit = shouldPaginate ? limit : 100; // Use max limit for calendar view
   const queryOffset = shouldPaginate ? offset : 0; // Reset offset for calendar view
 
-  const query = trpc.viewer.bookings.get.useQuery({
-    limit: queryLimit,
-    offset: queryOffset,
-    filters: {
-      status,
-      eventTypeIds,
-      teamIds,
-      userIds,
-      attendeeName,
-      attendeeEmail,
-      bookingUid,
-      afterStartDate: dateRange?.startDate
-        ? dayjs(dateRange?.startDate).startOf("day").toISOString()
-        : undefined,
-      beforeEndDate: dateRange?.endDate ? dayjs(dateRange?.endDate).endOf("day").toISOString() : undefined,
+  const query = trpc.viewer.bookings.get.useQuery(
+    {
+      limit: queryLimit,
+      offset: queryOffset,
+      filters: {
+        status,
+        eventTypeIds,
+        teamIds,
+        userIds,
+        attendeeName,
+        attendeeEmail,
+        bookingUid,
+        afterStartDate: dateRange?.startDate
+          ? dayjs(dateRange?.startDate).startOf("day").toISOString()
+          : undefined,
+        beforeEndDate: dateRange?.endDate ? dayjs(dateRange?.endDate).endOf("day").toISOString() : undefined,
+      },
     },
-  });
+    {
+      staleTime: 5 * 60 * 1000, // 5 minutes - data is considered fresh
+      gcTime: 30 * 60 * 1000, // 30 minutes - cache retention time
+    }
+  );
 
   const isEmpty = useMemo(() => !query.data?.bookings.length, [query.data]);
 

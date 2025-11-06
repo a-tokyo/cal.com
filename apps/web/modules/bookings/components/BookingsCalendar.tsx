@@ -9,8 +9,6 @@ import {
   DataTableFilters,
   DataTableSegment,
   useDataTable,
-  useFilterValue,
-  ZDateRangeFilterValue,
   ColumnFilterType,
 } from "@calcom/features/data-table";
 import { CUSTOM_PRESET } from "@calcom/features/data-table/lib/dateRange";
@@ -36,7 +34,6 @@ const weekStartParser = createParser({
 export function BookingsCalendar({ table }: BookingsCalendarViewProps) {
   const { rows } = table.getRowModel();
   const { updateFilter } = useDataTable();
-  const dateRange = useFilterValue("dateRange", ZDateRangeFilterValue)?.data;
 
   const [currentWeekStart, setCurrentWeekStart] = useQueryState(
     "weekStart",
@@ -54,36 +51,20 @@ export function BookingsCalendar({ table }: BookingsCalendarViewProps) {
     (newWeekStart: dayjs.Dayjs) => {
       setCurrentWeekStart(newWeekStart);
 
+      // Always set the date range to match the current week exactly
       const startDate = newWeekStart.toDate();
       const endDate = newWeekStart.add(6, "day").toDate();
-
-      if (!dateRange) {
-        return;
-      }
-
-      const rangeStart = dateRange.startDate ? new Date(dateRange.startDate) : null;
-      const rangeEnd = dateRange.endDate ? new Date(dateRange.endDate) : null;
-
-      const needsStartUpdate = !rangeStart || startDate < rangeStart;
-      const needsEndUpdate = !rangeEnd || endDate > rangeEnd;
-
-      if (!needsStartUpdate && !needsEndUpdate) {
-        return;
-      }
-
-      const newStartDate = needsStartUpdate ? startDate : rangeStart;
-      const newEndDate = needsEndUpdate ? endDate : rangeEnd;
 
       updateFilter("dateRange", {
         type: ColumnFilterType.DATE_RANGE,
         data: {
-          startDate: newStartDate.toISOString(),
-          endDate: newEndDate.toISOString(),
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString(),
           preset: CUSTOM_PRESET.value,
         },
       });
     },
-    [dateRange, updateFilter, setCurrentWeekStart]
+    [updateFilter, setCurrentWeekStart]
   );
 
   return (
