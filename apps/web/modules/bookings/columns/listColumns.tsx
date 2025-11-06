@@ -7,6 +7,7 @@ import { AvatarGroup } from "@calcom/ui/components/avatar";
 import { Badge } from "@calcom/ui/components/badge";
 import { Button } from "@calcom/ui/components/button";
 
+import { JoinMeetingButton } from "../components/JoinMeetingButton";
 import type { RowData } from "../types";
 
 interface PendingActionHandlers {
@@ -120,6 +121,8 @@ export function buildListDisplayColumns({
         const isPending = booking.status === "PENDING";
         const isUpcoming = new Date(booking.endTime) >= new Date();
         const isCancelled = booking.status === "CANCELLED";
+        const isRejected = booking.status === "REJECTED";
+        const isAccepted = booking.status === "ACCEPTED";
 
         // Determine if we should show pending actions
         const shouldShowPendingActions = isPending && isUpcoming && !isCancelled;
@@ -129,6 +132,9 @@ export function buildListDisplayColumns({
         const isPaid = booking.paid;
         const shouldShowAccept = shouldShowPendingActions && (!hasPayment || isPaid);
         const shouldShowReject = shouldShowPendingActions;
+
+        // Show join meeting button only for upcoming accepted/confirmed bookings
+        const shouldShowJoinButton = isAccepted && isUpcoming && !isCancelled && !isRejected;
 
         // Determine if this is a recurring booking for the label
         const isRecurring = booking.recurringEventId !== null;
@@ -165,6 +171,14 @@ export function buildListDisplayColumns({
                 }}>
                 {showAllLabel ? t("confirm_all") : t("confirm")}
               </Button>
+            )}
+            {shouldShowJoinButton && (
+              <JoinMeetingButton
+                location={booking.location}
+                metadata={booking.metadata}
+                bookingStatus={booking.status}
+                t={t}
+              />
             )}
             <Button
               variant="icon"
