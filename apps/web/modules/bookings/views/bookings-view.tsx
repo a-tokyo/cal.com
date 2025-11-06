@@ -150,9 +150,14 @@ function BookingsContent({ status, permissions }: BookingsProps) {
 
   const { limit, offset } = useDataTable();
 
+  // Only apply pagination for list view, calendar view needs all bookings
+  const shouldPaginate = view === "list";
+  const queryLimit = shouldPaginate ? limit : 100; // Use max limit for calendar view
+  const queryOffset = shouldPaginate ? offset : 0; // Reset offset for calendar view
+
   const query = trpc.viewer.bookings.get.useQuery({
-    limit,
-    offset,
+    limit: queryLimit,
+    offset: queryOffset,
     filters: {
       status,
       eventTypeIds,
