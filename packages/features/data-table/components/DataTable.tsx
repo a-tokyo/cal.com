@@ -396,10 +396,10 @@ function DataTableBody<TData>({
           <TableRow
             ref={virtualItem ? (node) => filteredRowVirtualizer.measureElement(node) : undefined}
             key={row.id}
-            data-index={virtualItem?.index} // needed for dynamic row height measurement
-            data-state={row.getIsSelected() && "selected"}
             data-testid={computedRowTestId}
             {...computedDataAttributes}
+            data-index={virtualItem?.index} // needed for dynamic row height measurement
+            data-state={row.getIsSelected() && "selected"}
             onClick={() => onRowMouseclick && onRowMouseclick(row)}
             style={{
               display: "flex",

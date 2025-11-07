@@ -36,11 +36,13 @@ export function ViewToggleButton() {
         options={[
           {
             value: "list",
+            label: "",
             tooltip: t("list_view"),
             iconLeft: <Icon name="menu" className="h-4 w-4" />,
           },
           {
             value: "calendar",
+            label: "",
             tooltip: t("calendar_view"),
             iconLeft: <Icon name="calendar" className="h-4 w-4" />,
           },
