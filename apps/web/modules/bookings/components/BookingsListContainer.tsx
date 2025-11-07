@@ -16,7 +16,10 @@ import { useFacetedUniqueValues } from "~/bookings/hooks/useFacetedUniqueValues"
 
 import { buildFilterColumns, getFilterColumnVisibility } from "../columns/filterColumns";
 import { buildListDisplayColumns } from "../columns/listColumns";
+import { useBookingCursor } from "../hooks/useBookingCursor";
+import { useSelectedBookingId } from "../hooks/useSelectedBookingId";
 import type { RowData, BookingListingStatus } from "../types";
+import { BookingDetailsSheet } from "./BookingDetailsSheet";
 import { BookingsList } from "./BookingsList";
 
 interface BookingsListContainerProps {
@@ -27,7 +30,6 @@ interface BookingsListContainerProps {
   data: RowData[];
   isPending: boolean;
   totalRowCount?: number;
-  onOpenDetails: (bookingId: number) => void;
 }
 
 export function BookingsListContainer({
@@ -36,11 +38,30 @@ export function BookingsListContainer({
   data,
   isPending,
   totalRowCount,
-  onOpenDetails,
 }: BookingsListContainerProps) {
   const { t } = useLocale();
   const user = useMeQuery().data;
   const utils = trpc.useUtils();
+
+  const [selectedBookingId, setSelectedBookingId] = useSelectedBookingId();
+
+  // Filter out separator rows and extract bookings
+  const bookings = useMemo(() => {
+    return data
+      .filter((row): row is Extract<RowData, { type: "data" }> => row.type === "data")
+      .map((row) => row.booking);
+  }, [data]);
+
+  const selectedBooking = useMemo(() => {
+    if (!selectedBookingId) return null;
+    return bookings.find((booking) => booking.id === selectedBookingId) ?? null;
+  }, [selectedBookingId, bookings]);
+
+  const bookingNavigation = useBookingCursor({
+    bookings,
+    selectedBookingId,
+    setSelectedBookingId,
+  });
 
   const [rejectionDialogIsOpen, setRejectionDialogIsOpen] = useState(false);
   const [rejectionReason, setRejectionReason] = useState<string>("");
@@ -95,6 +116,13 @@ export function BookingsListContainer({
       ...(pendingRejection.recurringEventId && { recurringEventId: pendingRejection.recurringEventId }),
     });
   }, [pendingRejection, rejectionReason, confirmMutation]);
+
+  const onOpenDetails = useCallback(
+    (bookingId: number) => {
+      setSelectedBookingId(bookingId);
+    },
+    [setSelectedBookingId]
+  );
 
   const columns = useMemo(() => {
     const filterCols = buildFilterColumns({ t, permissions, status });
@@ -163,6 +191,20 @@ export function BookingsListContainer({
         isPending={isPending}
         totalRowCount={totalRowCount}
         onOpenDetails={onOpenDetails}
+      />
+
+      <BookingDetailsSheet
+        booking={selectedBooking}
+        isOpen={!!selectedBooking}
+        onClose={() => setSelectedBookingId(null)}
+        userTimeZone={user?.timeZone}
+        userTimeFormat={user?.timeFormat === null ? undefined : user?.timeFormat}
+        userId={user?.id}
+        userEmail={user?.email}
+        onPrevious={bookingNavigation.onPrevious}
+        hasPrevious={bookingNavigation.hasPrevious}
+        onNext={bookingNavigation.onNext}
+        hasNext={bookingNavigation.hasNext}
       />
     </>
   );

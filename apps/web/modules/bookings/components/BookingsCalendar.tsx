@@ -1,8 +1,7 @@
 "use client";
 
 import type { Table as ReactTable } from "@tanstack/react-table";
-import { createParser, useQueryState } from "nuqs";
-import { useMemo, useCallback } from "react";
+import { useCallback } from "react";
 
 import dayjs from "@calcom/dayjs";
 import {
@@ -13,41 +12,32 @@ import {
 } from "@calcom/features/data-table";
 import { CUSTOM_PRESET } from "@calcom/features/data-table/lib/dateRange";
 
-import type { RowData, BookingListingStatus } from "../types";
+import type { RowData, BookingListingStatus, BookingOutput } from "../types";
 import { BookingsCalendarView } from "./BookingsCalendarView";
 
-type BookingsCalendarViewProps = {
+type BookingsCalendarProps = {
   status: BookingListingStatus;
   table: ReactTable<RowData>;
   isPending?: boolean;
   onOpenDetails: (bookingId: number) => void;
+  currentWeekStart: dayjs.Dayjs;
+  setCurrentWeekStart: (
+    value: dayjs.Dayjs | ((old: dayjs.Dayjs) => dayjs.Dayjs | null) | null
+  ) => Promise<URLSearchParams>;
+  bookings: BookingOutput[];
 };
 
 const COLUMN_IDS_TO_HIDE = ["dateRange"];
 
-const weekStartParser = createParser({
-  parse: (value: string) => {
-    const parsed = dayjs(value);
-    return parsed.isValid() ? parsed.startOf("week") : dayjs().startOf("week");
-  },
-  serialize: (value: dayjs.Dayjs) => value.format("YYYY-MM-DD"),
-});
-
-export function BookingsCalendar({ table, isPending = false, onOpenDetails }: BookingsCalendarViewProps) {
-  const { rows } = table.getRowModel();
+export function BookingsCalendar({
+  table,
+  isPending = false,
+  onOpenDetails,
+  currentWeekStart,
+  setCurrentWeekStart,
+  bookings,
+}: BookingsCalendarProps) {
   const { updateFilter } = useDataTable();
-
-  const [currentWeekStart, setCurrentWeekStart] = useQueryState(
-    "weekStart",
-    weekStartParser.withDefault(dayjs().startOf("week"))
-  );
-
-  const bookings = useMemo(() => {
-    return rows
-      .filter((row) => row.original.type === "data")
-      .map((row) => (row.original.type === "data" ? row.original.booking : null))
-      .filter((booking): booking is NonNullable<typeof booking> => booking !== null);
-  }, [rows]);
 
   const handleWeekStartChange = useCallback(
     (newWeekStart: dayjs.Dayjs) => {

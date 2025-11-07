@@ -28,9 +28,7 @@ import { WipeMyCalActionButton } from "@calcom/web/components/apps/wipemycalothe
 import type { validStatuses } from "~/bookings/lib/validStatuses";
 import { viewParser } from "~/bookings/lib/viewParser";
 
-import { BookingDetailsSheet } from "../components/BookingDetailsSheet";
-import { useBookingCursor } from "../hooks/useBookingCursor";
-import type { RowData, BookingOutput } from "../types";
+import type { RowData } from "../types";
 
 const BookingsListContainer = dynamic(() =>
   import("../components/BookingsListContainer").then((mod) => ({ default: mod.BookingsListContainer }))
@@ -95,12 +93,6 @@ function BookingsContent({ status, permissions }: BookingsProps) {
   const { t } = useLocale();
   const user = useMeQuery().data;
   const searchParams = useSearchParams();
-  const [selectedBookingId, setSelectedBookingId] = useQueryState("selectedId", {
-    defaultValue: null,
-    parse: (value) => (value ? parseInt(value, 10) : null),
-    serialize: (value) => (value ? String(value) : ""),
-    clearOnDefault: true,
-  });
 
   const tabs: HorizontalTabItemProps[] = useMemo(() => {
     const queryString = searchParams?.toString() || "";
@@ -280,27 +272,8 @@ function BookingsContent({ status, permissions }: BookingsProps) {
     return merged;
   }, [groupedBookings, status, t, flatData]);
 
-  const selectedBooking = useMemo(() => {
-    if (!selectedBookingId) return null;
-    const dataRow = finalData.find(
-      (row): row is Extract<RowData, { type: "data" }> =>
-        row.type === "data" && row.booking.id === selectedBookingId
-    );
-    return dataRow?.booking ?? null;
-  }, [selectedBookingId, finalData]);
-
-  const bookingNavigation = useBookingCursor({
-    bookings: finalData,
-    selectedBookingId,
-    setSelectedBookingId,
-  });
-
   const isPending = query.isPending;
   const totalRowCount = query.data?.totalCount;
-
-  const handleOpenDetails = (bookingId: number) => {
-    setSelectedBookingId(bookingId);
-  };
 
   return (
     <div className="flex flex-col">
@@ -328,7 +301,6 @@ function BookingsContent({ status, permissions }: BookingsProps) {
                   data={finalData}
                   isPending={isPending}
                   totalRowCount={totalRowCount}
-                  onOpenDetails={handleOpenDetails}
                 />
               ) : (
                 <BookingsCalendarContainer
@@ -336,26 +308,12 @@ function BookingsContent({ status, permissions }: BookingsProps) {
                   permissions={permissions}
                   data={finalData}
                   isPending={isPending}
-                  onOpenDetails={handleOpenDetails}
                 />
               )}
             </>
           )}
         </div>
       </main>
-      <BookingDetailsSheet
-        booking={selectedBooking}
-        isOpen={!!selectedBooking}
-        onClose={() => setSelectedBookingId(null)}
-        userTimeZone={user?.timeZone}
-        userTimeFormat={user?.timeFormat === null ? undefined : user?.timeFormat}
-        userId={user?.id}
-        userEmail={user?.email}
-        onPrevious={bookingNavigation.onPrevious}
-        hasPrevious={bookingNavigation.hasPrevious}
-        onNext={bookingNavigation.onNext}
-        hasNext={bookingNavigation.hasNext}
-      />
     </div>
   );
 }
