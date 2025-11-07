@@ -139,7 +139,7 @@ export function buildListDisplayColumns({
         const shouldShowPendingActions = isPending && isUpcoming && !isCancelled;
 
         // Determine which buttons to show based on payment status
-        const hasPayment = booking.payment.length > 0;
+        const hasPayment = Array.isArray(booking.payment) && booking.payment.length > 0;
         const isPaid = booking.paid;
         const shouldShowAccept = shouldShowPendingActions && (!hasPayment || isPaid);
         const shouldShowReject = shouldShowPendingActions;
