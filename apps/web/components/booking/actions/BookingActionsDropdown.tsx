@@ -38,6 +38,8 @@ import {
   getAfterEventActions,
   getReportAction,
   shouldShowEditActions,
+  shouldShowPendingActions,
+  getPendingActions,
   type BookingActionContext,
 } from "./bookingActions";
 
@@ -209,6 +211,10 @@ export function BookingActionsDropdown({ booking, size = "base" }: BookingAction
     }
   };
 
+  // Calculate showPendingPayment based on payment logic
+  const hasPayment = booking.payment.length > 0;
+  const showPendingPayment = hasPayment;
+
   const actionContext: BookingActionContext = {
     booking,
     isUpcoming,
@@ -226,7 +232,7 @@ export function BookingActionsDropdown({ booking, size = "base" }: BookingAction
     isDisabledCancelling,
     isDisabledRescheduling,
     isCalVideoLocation,
-    showPendingPayment: false, // This will be calculated below
+    showPendingPayment,
     isAttendee,
     cardCharged,
     attendeeList,
@@ -235,6 +241,20 @@ export function BookingActionsDropdown({ booking, size = "base" }: BookingAction
   } as BookingActionContext;
 
   const cancelEventAction = getCancelEventAction(actionContext);
+
+  // Get pending actions (accept/reject)
+  const shouldShowPending = shouldShowPendingActions(actionContext);
+  const basePendingActions = shouldShowPending ? getPendingActions(actionContext) : [];
+  const pendingActions: ActionType[] = basePendingActions.map((action) => ({
+    ...action,
+    disabled: mutation.isPending,
+    onClick:
+      action.id === "confirm"
+        ? () => bookingConfirm(true)
+        : action.id === "reject"
+        ? () => setRejectionDialogIsOpen(true)
+        : undefined,
+  })) as ActionType[];
 
   const shouldShowEdit = shouldShowEditActions(actionContext);
   const baseEditEventActions = getEditEventActions(actionContext);
@@ -498,6 +518,9 @@ export function BookingActionsDropdown({ booking, size = "base" }: BookingAction
 
   // Check if there are any available actions across all action groups
   const hasAnyAvailableActions = () => {
+    // Check if any pending action is available
+    const hasAvailablePendingAction = pendingActions.some((action) => !action.disabled);
+
     // Check if any edit action is available
     const hasAvailableEditAction = editEventActions.some((action) => !action.disabled);
 
@@ -508,7 +531,13 @@ export function BookingActionsDropdown({ booking, size = "base" }: BookingAction
     const isReportAvailable = !reportActionWithHandler.disabled;
     const isCancelAvailable = !cancelEventAction.disabled;
 
-    return hasAvailableEditAction || hasAvailableAfterAction || isReportAvailable || isCancelAvailable;
+    return (
+      hasAvailablePendingAction ||
+      hasAvailableEditAction ||
+      hasAvailableAfterAction ||
+      isReportAvailable ||
+      isCancelAvailable
+    );
   };
 
   // Don't render dropdown if no actions are available
@@ -524,6 +553,28 @@ export function BookingActionsDropdown({ booking, size = "base" }: BookingAction
           <Button type="button" color="secondary" variant="icon" size={size} StartIcon="ellipsis" />
         </DropdownMenuTrigger>
         <DropdownMenuContent>
+          {pendingActions.length > 0 && (
+            <>
+              <DropdownMenuLabel className="px-2 pb-1 pt-1.5">{t("booking_response")}</DropdownMenuLabel>
+              {pendingActions.map((action) => (
+                <DropdownMenuItem className="rounded-lg" key={action.id} disabled={action.disabled}>
+                  <DropdownItem
+                    type="button"
+                    color={action.color}
+                    StartIcon={action.icon}
+                    href={action.href}
+                    disabled={action.disabled}
+                    onClick={action.onClick}
+                    data-bookingid={action.bookingId}
+                    data-testid={action.id}
+                    className={action.disabled ? "text-muted" : undefined}>
+                    {action.label}
+                  </DropdownItem>
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuSeparator />
+            </>
+          )}
           <DropdownMenuLabel className="px-2 pb-1 pt-1.5">{t("edit_event")}</DropdownMenuLabel>
           {editEventActions.map((action) => (
             <DropdownMenuItem className="rounded-lg" key={action.id} disabled={action.disabled}>
