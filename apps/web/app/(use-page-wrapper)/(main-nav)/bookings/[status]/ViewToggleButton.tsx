@@ -3,6 +3,7 @@
 import { useQueryState } from "nuqs";
 import { useEffect } from "react";
 
+import { useLocale } from "@calcom/lib/hooks/useLocale";
 import useMediaQuery from "@calcom/lib/hooks/useMediaQuery";
 import { ToggleGroup } from "@calcom/ui/components/form";
 import { Icon } from "@calcom/ui/components/icon";
@@ -10,6 +11,7 @@ import { Icon } from "@calcom/ui/components/icon";
 import { viewParser, type BookingView } from "~/bookings/lib/viewParser";
 
 export function ViewToggleButton() {
+  const { t } = useLocale();
   const [view, setView] = useQueryState(
     "view",
     viewParser.withDefault("list").withOptions({ clearOnDefault: true })
@@ -34,12 +36,12 @@ export function ViewToggleButton() {
         options={[
           {
             value: "list",
-            label: "",
+            tooltip: t("list_view"),
             iconLeft: <Icon name="menu" className="h-4 w-4" />,
           },
           {
             value: "calendar",
-            label: "",
+            tooltip: t("calendar_view"),
             iconLeft: <Icon name="calendar" className="h-4 w-4" />,
           },
         ]}

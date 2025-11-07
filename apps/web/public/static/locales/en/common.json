@@ -3968,5 +3968,7 @@
   "recurring_booking_description": "Recurring {{frequency}} event with {{count}} occurrences",
   "view": "View",
   "booking_response": "Booking Response",
+  "list_view": "List view",
+  "calendar_view": "Calendar view",
   "ADD_NEW_STRINGS_ABOVE_THIS_LINE_TO_PREVENT_MERGE_CONFLICTS": "↑↑↑↑↑↑↑↑↑↑↑↑↑ Add your new strings above here ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑"
 }
