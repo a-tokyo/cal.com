@@ -155,9 +155,17 @@ export function BookingsListContainer({
     getFacetedUniqueValues,
   });
 
+  const handleRejectionDialogChange = useCallback((open: boolean) => {
+    setRejectionDialogIsOpen(open);
+    if (!open) {
+      setRejectionReason("");
+      setPendingRejection(null);
+    }
+  }, []);
+
   return (
     <>
-      <Dialog open={rejectionDialogIsOpen} onOpenChange={setRejectionDialogIsOpen}>
+      <Dialog open={rejectionDialogIsOpen} onOpenChange={handleRejectionDialogChange}>
         <DialogContent title={t("rejection_reason_title")} description={t("rejection_reason_description")}>
           <div>
             <TextAreaField
