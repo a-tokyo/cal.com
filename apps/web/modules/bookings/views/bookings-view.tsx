@@ -28,7 +28,7 @@ import { WipeMyCalActionButton } from "@calcom/web/components/apps/wipemycalothe
 import type { validStatuses } from "~/bookings/lib/validStatuses";
 import { viewParser } from "~/bookings/lib/viewParser";
 
-import type { RowData } from "../types";
+import type { RowData, BookingOutput } from "../types";
 
 const BookingsListContainer = dynamic(() =>
   import("../components/BookingsListContainer").then((mod) => ({ default: mod.BookingsListContainer }))
@@ -224,6 +224,12 @@ function BookingsContent({ status, permissions }: BookingsProps) {
       } else if (bookingDate.isAfter(currentMonthStart) && bookingDate.isBefore(currentMonthEnd)) {
         currentMonthBookings.push(rowData);
       } else if (bookingDate.isAfter(currentMonthEnd)) {
+        if (!monthBuckets[monthKey]) {
+          monthBuckets[monthKey] = [];
+        }
+        monthBuckets[monthKey].push(rowData);
+      } else if (bookingDate.isBefore(currentMonthStart)) {
+        // Handle bookings from months before the current month
         if (!monthBuckets[monthKey]) {
           monthBuckets[monthKey] = [];
         }
