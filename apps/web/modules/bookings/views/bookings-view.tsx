@@ -336,6 +336,7 @@ function BookingsContent({ status, permissions }: BookingsProps) {
                   permissions={permissions}
                   data={finalData}
                   isPending={isPending}
+                  onOpenDetails={handleOpenDetails}
                 />
               )}
             </>

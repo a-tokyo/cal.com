@@ -201,7 +201,7 @@ export function buildListDisplayColumns({
               data-testid="booking-options"
               onClick={(e) => {
                 e.stopPropagation();
-                onOpenDetails?.(row.booking.id);
+                onOpenDetails(row.booking.id);
               }}
             />
           </div>

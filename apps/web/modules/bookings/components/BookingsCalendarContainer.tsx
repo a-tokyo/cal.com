@@ -18,6 +18,7 @@ interface BookingsCalendarContainerProps {
   };
   data: RowData[];
   isPending?: boolean;
+  onOpenDetails: (bookingId: number) => void;
 }
 
 export function BookingsCalendarContainer({
@@ -25,6 +26,7 @@ export function BookingsCalendarContainer({
   permissions,
   data,
   isPending = false,
+  onOpenDetails,
 }: BookingsCalendarContainerProps) {
   const { t } = useLocale();
 
@@ -45,5 +47,7 @@ export function BookingsCalendarContainer({
     getFacetedUniqueValues,
   });
 
-  return <BookingsCalendar status={status} table={table} isPending={isPending} />;
+  return (
+    <BookingsCalendar status={status} table={table} isPending={isPending} onOpenDetails={onOpenDetails} />
+  );
 }

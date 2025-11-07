@@ -19,6 +19,7 @@ type BookingsCalendarViewProps = {
   currentWeekStart: dayjs.Dayjs;
   onWeekStartChange: (weekStart: dayjs.Dayjs) => void;
   isPending?: boolean;
+  onOpenDetails: (bookingId: number) => void;
 };
 
 export function BookingsCalendarView({
@@ -26,6 +27,7 @@ export function BookingsCalendarView({
   currentWeekStart,
   onWeekStartChange,
   isPending = false,
+  onOpenDetails,
 }: BookingsCalendarViewProps) {
   const { t } = useLocale();
   const { timezone } = useTimePreferences();
@@ -82,6 +84,7 @@ export function BookingsCalendarView({
           options: {
             status: booking.status,
             ...(eventTypeColor && { color: eventTypeColor }),
+            bookingId: booking.id,
           },
         };
       });
@@ -146,7 +149,12 @@ export function BookingsCalendarView({
           showBackgroundPattern={false}
           showBorder={false}
           borderColor="subtle"
-          onEventClick={(_event) => {}}
+          onEventClick={(event) => {
+            const bookingId = event.options?.bookingId;
+            if (bookingId) {
+              onOpenDetails(bookingId);
+            }
+          }}
           hideHeader
         />
       </div>
