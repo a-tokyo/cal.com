@@ -32,6 +32,7 @@ import type { BookingListingStatus } from "../../../components/booking/types";
 import { buildBookingLink } from "../lib/buildBookingLink";
 import type { BookingOutput } from "../types";
 import { JoinMeetingButton } from "./JoinMeetingButton";
+import { useJoinableLocation } from "./useJoinableLocation";
 
 type BookingMetaData = z.infer<typeof bookingMetadataSchema>;
 
@@ -108,6 +109,13 @@ function BookingDetailsSheetInner({
 
   const parsedMetadata = bookingMetadataSchema.safeParse(booking.metadata ?? null);
   const bookingMetadata = parsedMetadata.success ? parsedMetadata.data : null;
+
+  const { isJoinable: shouldShowJoinButton } = useJoinableLocation({
+    location: booking.location,
+    metadata: booking.metadata,
+    bookingStatus: booking.status,
+    t,
+  });
 
   const recurringInfo =
     booking.recurringEventId && booking.eventType?.recurringEvent
@@ -203,7 +211,7 @@ function BookingDetailsSheetInner({
               bookingStatus={booking.status}
               t={t}
             />
-            {booking.location && <div className="border-subtle h-3 w-px border-r" />}
+            {shouldShowJoinButton && <div className="border-subtle h-3 w-px border-r" />}
             <Button color="secondary" size="sm" EndIcon="external-link" href={bookingLink} target="_blank">
               {t("view")}
             </Button>

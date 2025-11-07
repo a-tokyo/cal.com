@@ -1,12 +1,10 @@
 "use client";
 
-import { useMemo } from "react";
-
-import { useBookingLocation } from "@calcom/features/bookings/hooks";
 import type { BookingStatus } from "@calcom/prisma/enums";
-import { bookingMetadataSchema } from "@calcom/prisma/zod-utils";
 import classNames from "@calcom/ui/classNames";
 import { Button } from "@calcom/ui/components/button";
+
+import { useJoinableLocation } from "./useJoinableLocation";
 
 interface JoinMeetingButtonProps {
   location: string | null;
@@ -29,19 +27,14 @@ export function JoinMeetingButton({
   className,
   onClick,
 }: JoinMeetingButtonProps) {
-  const bookingMetadata = useMemo(() => {
-    const parsedMetadata = bookingMetadataSchema.safeParse(metadata ?? null);
-    return parsedMetadata.success ? parsedMetadata.data : null;
-  }, [metadata]);
-
-  const { locationToDisplay, provider, isLocationURL } = useBookingLocation({
+  const { isJoinable, locationToDisplay, provider } = useJoinableLocation({
     location,
-    videoCallUrl: bookingMetadata?.videoCallUrl,
-    t,
+    metadata,
     bookingStatus,
+    t,
   });
 
-  if (!isLocationURL || !locationToDisplay) {
+  if (!isJoinable) {
     return null;
   }
 
@@ -56,6 +49,7 @@ export function JoinMeetingButton({
       size={size}
       href={locationToDisplay}
       target="_blank"
+      rel="noopener noreferrer"
       className={classNames("flex items-center gap-2", className)}
       onClick={handleClick}>
       {provider?.iconUrl && (
