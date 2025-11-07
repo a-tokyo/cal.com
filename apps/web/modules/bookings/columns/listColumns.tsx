@@ -21,7 +21,7 @@ interface BuildListDisplayColumnsParams {
   user?: {
     timeZone?: string;
     timeFormat?: number | null;
-  } | null;
+  };
   onOpenDetails: (bookingId: number) => void;
   pendingActionHandlers: PendingActionHandlers;
 }
