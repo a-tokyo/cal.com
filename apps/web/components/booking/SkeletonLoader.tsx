@@ -13,7 +13,7 @@ function SkeletonLoader() {
           <SkeletonItem isHeader={true} />
         </div>
         <div className="bg-muted">
-          <SkeletonText className="ml-2 mt-2 h-4 w-28 rounded" />
+          <SkeletonText className="ml-2 mt-3 h-4 w-28 rounded" />
         </div>
 
         <SkeletonItem />
@@ -30,7 +30,11 @@ export default SkeletonLoader;
 
 function SkeletonItem({ isHeader = false }: { isHeader?: boolean }) {
   return (
-    <div className="grid grid-cols-[100px_140px_180px_100px_140px_280px] gap-6 px-2 py-2">
+    <div
+      className={classNames(
+        "grid grid-cols-[132px_130px_185px_150px_140px_280px] gap-6 px-2",
+        isHeader ? "py-2" : "py-2.5"
+      )}>
       {/* Date column - 140px */}
       <div className="flex items-center">
         <SkeletonText className={classNames("h-4 rounded", isHeader ? "w-12" : "w-20")} />
