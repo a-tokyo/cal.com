@@ -1,5 +1,11 @@
 ## 1.1.2
 
+## 1.13.0
+
+### Minor Changes
+
+- [#24857](https://github.com/calcom/cal.com/pull/24857) [`c6daa61`](https://github.com/calcom/cal.com/commit/c6daa61e5efe24665f3d3dd0bea33c79dda6f797) Thanks [@ibex088](https://github.com/ibex088)! - Fix Booker atom verify email dialog infinite re-render when entering verification code
+
 ## 1.12.1
 
 ### Patch Changes
